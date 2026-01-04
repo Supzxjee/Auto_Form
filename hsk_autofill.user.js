@@ -31,14 +31,18 @@
 (function () {
     'use strict';
 
-    // THÔNG TIN
+    // THÔNG TIN - SỬA Ở ĐÂY!
     const INFO = {
         fullName: "LE DUC ANH",
         idType: "cmnd",
         idNumber: "075205017934",
         gender: "nam",
         nationality: "vietnam",
-        phone: "0347384670"
+        phone: "0347384670",
+
+        // ⚡ CẤP ĐỘ THI - Sửa text này cho đúng với form chính thức!
+        // Ví dụ: "MÔ PHỎNG", "HSK5", "HSK5 + HSKK 高级", "HSK4", v.v.
+        examLevel: "HSK 5 + HSKK 高级: 1.900.000đ"
     };
 
     const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -46,6 +50,18 @@
     const clickNext = () => {
         for (const b of document.querySelectorAll('[role="button"]')) {
             if (b.textContent.includes('Tiếp')) { b.click(); return true; }
+        }
+        return false;
+    };
+
+    // Tìm và click radio theo text
+    const clickRadioByText = (text) => {
+        const radios = document.querySelectorAll('[role="radio"]');
+        for (const r of radios) {
+            if (r.textContent.includes(text) || r.getAttribute('aria-label')?.includes(text)) {
+                r.click();
+                return true;
+            }
         }
         return false;
     };
@@ -88,13 +104,12 @@
             }
             else if (page === 3) {
                 await sleep(150);
-                clickRadio(0);
-                await sleep(100);
-                // Retry nếu chưa được tick
-                if (!document.querySelector('[role="radio"][aria-checked="true"]')) {
+                // Tìm và click cấp độ thi theo text
+                if (!clickRadioByText(INFO.examLevel)) {
+                    // Nếu không tìm thấy, thử click radio đầu tiên
                     clickRadio(0);
-                    await sleep(100);
                 }
+                await sleep(100);
                 localStorage.setItem('hsk_page', '4');
                 clickNext();
             }
