@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HSK Form - Pre-filled URL Generator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 HSK Form - Cách DỄ NHẤT!</h1>
+            <p class="subtitle">Tạo link điền sẵn - Không cần code gì cả!</p>
+        </header>
+
+        <div class="content-simple">
+            <div class="alert success">
+                <strong>✨ Cách hoạt động:</strong><br>
+                1. Nhập thông tin bên dưới<br>
+                2. Click "Tạo Link"<br>
+                3. Mở link → Form đã điền sẵn 90%!<br>
+                4. Chỉ cần điền câu xác thực và Submit
+            </div>
+
+            <div class="form-section-simple">
+                <h2>📝 Thông tin của bạn</h2>
+
+                <div class="form-group">
+                    <label for="fullName">Họ và tên <span class="required">*</span></label>
+                    <input type="text" id="fullName" placeholder="VD: NGUYEN VAN A" required>
+                    <small>⚠️ Nhập IN HOA KHÔNG DẤU</small>
+                </div>
+
+                <div class="form-group">
+                    <label>Loại giấy tờ <span class="required">*</span></label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="idType" value="hộchiếu" id="passport">
+                            <span>Hộ chiếu / 护照</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="idType" value="cmnd-cccd" id="idcard" checked>
+                            <span>CMND - CCCD / 身份证</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="idNumber">Số giấy tờ <span class="required">*</span></label>
+                    <input type="text" id="idNumber" placeholder="VD: 001234567890" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Giới tính <span class="required">*</span></label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="gender" value="nam" id="male" checked>
+                            <span>Nam / 男</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="gender" value="nữ" id="female">
+                            <span>Nữ / 女</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Quốc tịch <span class="required">*</span></label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="nationality" value="vietnam" id="vn" checked>
+                            <span>Việt Nam</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="nationality" value="other" id="other">
+                            <span>Khác</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Số điện thoại <span class="required">*</span></label>
+                    <input type="tel" id="phone" placeholder="VD: 0901234567" required>
+                </div>
+
+                <button id="generateUrlBtn" class="generate-btn">
+                    🚀 Tạo Link Điền Sẵn
+                </button>
+            </div>
+
+            <div class="result-section" id="resultSection" style="display: none;">
+                <h2>🎉 Link của bạn đây!</h2>
+
+                <div class="alert info">
+                    <strong>📋 Sao chép link bên dưới:</strong>
+                </div>
+
+                <div class="url-container">
+                    <input type="text" id="generatedUrl" readonly>
+                    <button id="copyUrlBtn" class="copy-btn">📋 Copy</button>
+                </div>
+
+                <button id="openUrlBtn" class="open-btn">
+                    🌐 Mở Form Ngay
+                </button>
+
+                <div class="alert warning">
+                    <strong>⚠️ Lưu ý khi mở link:</strong><br>
+                    - Trang 1 (Email): Đã tự động check ✅<br>
+                    - Trang 2-11: Đã điền sẵn tất cả ✅<br>
+                    - Trang 12: Bạn cần tự điền câu xác thực (nó thay đổi mỗi lần)<br>
+                    - Kiểm tra lại thông tin và nhấn Submit!
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Field IDs từ Google Form
+        const FIELD_IDS = {
+            examLevel: '2060993153',
+            fullName: '518285016',
+            idType: '1288357414',
+            idNumber: '2112372857',
+            gender: '1936453959',
+            nationality: '1873758553',
+            phone: '1774947177',
+            commitment: '1413893084'
+        };
+
+        const BASE_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSdo9nic0WZgIU2bEaxZnXxMLCttvhLNpPzqPh8p_ZfORk6TLw/viewform';
+
+        // Auto uppercase
+        document.getElementById('fullName').addEventListener('input', function (e) {
+            this.value = this.value.toUpperCase();
+        });
+
+        // Generate URL
+        document.getElementById('generateUrlBtn').addEventListener('click', function () {
+            const fullName = document.getElementById('fullName').value.trim();
+            const idType = document.querySelector('input[name="idType"]:checked').value;
+            const idNumber = document.getElementById('idNumber').value.trim();
+            const gender = document.querySelector('input[name="gender"]:checked').value;
+            const nationality = document.querySelector('input[name="nationality"]:checked').value;
+            const phone = document.getElementById('phone').value.trim();
+
+            // Validate
+            if (!fullName || !idNumber || !phone) {
+                alert('⚠️ Vui lòng điền đầy đủ các trường bắt buộc (*)');
+                return;
+            }
+
+            if (fullName !== fullName.toUpperCase()) {
+                alert('⚠️ Họ tên phải viết IN HOA');
+                return;
+            }
+
+            // Build URL
+            const params = new URLSearchParams();
+
+            // Exam level (always MÔ PHỎNG)
+            params.append(`entry.${FIELD_IDS.examLevel}`, 'MÔ PHỎNG');
+
+            // Full name
+            params.append(`entry.${FIELD_IDS.fullName}`, fullName);
+
+            // ID type and number
+            params.append(`entry.${FIELD_IDS.idType}`, idType);
+            params.append(`entry.${FIELD_IDS.idNumber}`, idNumber);
+
+            // Gender
+            params.append(`entry.${FIELD_IDS.gender}`, gender);
+
+            // Nationality
+            params.append(`entry.${FIELD_IDS.nationality}`, nationality);
+
+            // Phone
+            params.append(`entry.${FIELD_IDS.phone}`, phone);
+
+            // Commitment
+            params.append(`entry.${FIELD_IDS.commitment}`, 'Tôi đồng ý với các điều kiện trên / 我已阅读并同意以上条件。');
+
+            const finalUrl = `${BASE_URL}?${params.toString()}`;
+
+            // Show result
+            document.getElementById('generatedUrl').value = finalUrl;
+            document.getElementById('resultSection').style.display = 'block';
+            document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth' });
+
+            // Store URL for open button
+            window.generatedFormUrl = finalUrl;
+
+            // Visual feedback
+            this.textContent = '✅ Đã tạo link!';
+            this.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+            setTimeout(() => {
+                this.textContent = '🚀 Tạo Link Điền Sẵn';
+                this.style.background = '';
+            }, 2000);
+        });
+
+        // Copy URL
+        document.getElementById('copyUrlBtn').addEventListener('click', async function () {
+            const urlInput = document.getElementById('generatedUrl');
+            urlInput.select();
+
+            try {
+                await navigator.clipboard.writeText(urlInput.value);
+                this.textContent = '✅ Đã copy!';
+                this.classList.add('copied');
+                setTimeout(() => {
+                    this.textContent = '📋 Copy';
+                    this.classList.remove('copied');
+                }, 2000);
+            } catch (err) {
+                alert('Lỗi khi copy. Vui lòng copy thủ công.');
+            }
+        });
+
+        // Open URL
+        document.getElementById('openUrlBtn').addEventListener('click', function () {
+            if (window.generatedFormUrl) {
+                window.open(window.generatedFormUrl, '_blank');
+            }
+        });
+    </script>
+</body>
+
+</html>
